@@ -1,30 +1,46 @@
+from pathlib import Path
 import streamlit as st
 import pandas as pd
 import joblib
 
-# Load model and encoders
-model = joblib.load("best_xgb_regressor.pkl")
+# -------------------------------
+# Load Model & Encoders
+# -------------------------------
+BASE_DIR = Path(__file__).resolve().parent
 
-sleep_quality_le = joblib.load("sleep_quality_label_encoder.pkl")
-study_method_le = joblib.load("study_method_label_encoder.pkl")
-facility_rating_le = joblib.load("facility_rating_label_encoder.pkl")
+model = joblib.load(BASE_DIR / "best_xgb_regressor.pkl")
 
-# Page Configuration
+sleep_quality_le = joblib.load(
+    BASE_DIR / "sleep_quality_label_encoder.pkl"
+)
+
+study_method_le = joblib.load(
+    BASE_DIR / "study_method_label_encoder.pkl"
+)
+
+facility_rating_le = joblib.load(
+    BASE_DIR / "facility_rating_label_encoder.pkl"
+)
+
+# -------------------------------
+# Streamlit UI
+# -------------------------------
 st.set_page_config(
     page_title="Exam Score Prediction",
     page_icon="📚",
     layout="centered"
 )
 
-st.title("📚 Exam Score Prediction App")
-st.write("Enter student details to predict the exam score.")
+st.title("📚 Exam Score Prediction using XGBoost")
+st.markdown("Enter student details below to predict the exam score.")
 
 # Numerical Inputs
 study_hours = st.number_input(
     "Study Hours",
     min_value=0.0,
     max_value=24.0,
-    value=5.0
+    value=5.0,
+    step=0.5
 )
 
 class_attendance = st.number_input(
@@ -38,7 +54,8 @@ sleep_hours = st.number_input(
     "Sleep Hours",
     min_value=0.0,
     max_value=24.0,
-    value=7.0
+    value=7.0,
+    step=0.5
 )
 
 # Categorical Inputs
@@ -57,14 +74,24 @@ facility_rating = st.selectbox(
     facility_rating_le.classes_
 )
 
-# Prediction Button
+# -------------------------------
+# Prediction
+# -------------------------------
 if st.button("Predict Exam Score"):
 
-    sleep_quality_encoded = sleep_quality_le.transform([sleep_quality])[0]
-    study_method_encoded = study_method_le.transform([study_method])[0]
-    facility_rating_encoded = facility_rating_le.transform([facility_rating])[0]
+    sleep_quality_encoded = sleep_quality_le.transform(
+        [sleep_quality]
+    )[0]
 
-    input_data = pd.DataFrame({
+    study_method_encoded = study_method_le.transform(
+        [study_method]
+    )[0]
+
+    facility_rating_encoded = facility_rating_le.transform(
+        [facility_rating]
+    )[0]
+
+    input_df = pd.DataFrame({
         "study_hours": [study_hours],
         "class_attendance": [class_attendance],
         "sleep_hours": [sleep_hours],
@@ -73,6 +100,10 @@ if st.button("Predict Exam Score"):
         "facility_rating": [facility_rating_encoded]
     })
 
-    prediction = model.predict(input_data)[0]
+    prediction = model.predict(input_df)[0]
 
     st.success(f"🎯 Predicted Exam Score: {prediction:.2f}")
+
+# Footer
+st.markdown("---")
+st.caption("Built with Streamlit & XGBoost")
