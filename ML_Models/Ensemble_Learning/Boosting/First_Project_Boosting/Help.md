@@ -5,4 +5,4 @@ cd "Ml_Models\Ensemble_Learning\Boosting\First_Project_Boosting"
 streamlit run app.py
 
 <!-- Search On Google -->
-https://deepak-delivery-time-random-f.streamlit.app/
+https://xgboost-exam-score-prediction.streamlit.app/

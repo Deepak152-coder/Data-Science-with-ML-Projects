@@ -3,9 +3,9 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-# -------------------------------
+# =========================
 # Load Model & Encoders
-# -------------------------------
+# =========================
 BASE_DIR = Path(__file__).resolve().parent
 
 model = joblib.load(BASE_DIR / "best_xgb_regressor.pkl")
@@ -22,9 +22,9 @@ facility_rating_le = joblib.load(
     BASE_DIR / "facility_rating_label_encoder.pkl"
 )
 
-# -------------------------------
-# Streamlit UI
-# -------------------------------
+# =========================
+# Page Configuration
+# =========================
 st.set_page_config(
     page_title="Exam Score Prediction",
     page_icon="📚",
@@ -32,52 +32,57 @@ st.set_page_config(
 )
 
 st.title("📚 Exam Score Prediction using XGBoost")
-st.markdown("Enter student details below to predict the exam score.")
+st.markdown("### Enter Student Details")
 
-# Numerical Inputs
-study_hours = st.number_input(
-    "Study Hours",
-    min_value=0.0,
-    max_value=24.0,
-    value=5.0,
-    step=0.5
-)
+# =========================
+# Input Section
+# =========================
+col1, col2 = st.columns(2)
 
-class_attendance = st.number_input(
-    "Class Attendance (%)",
-    min_value=0,
-    max_value=100,
-    value=80
-)
+with col1:
+    study_hours = st.slider(
+        "📖 Study Hours",
+        min_value=0.0,
+        max_value=24.0,
+        value=5.0,
+        step=0.5
+    )
 
-sleep_hours = st.number_input(
-    "Sleep Hours",
-    min_value=0.0,
-    max_value=24.0,
-    value=7.0,
-    step=0.5
-)
+    sleep_hours = st.slider(
+        "😴 Sleep Hours",
+        min_value=0.0,
+        max_value=12.0,
+        value=7.0,
+        step=0.5
+    )
 
-# Categorical Inputs
+with col2:
+    class_attendance = st.slider(
+        "🏫 Class Attendance (%)",
+        min_value=0,
+        max_value=100,
+        value=80
+    )
+
 sleep_quality = st.selectbox(
-    "Sleep Quality",
+    "🌙 Sleep Quality",
     sleep_quality_le.classes_
 )
 
 study_method = st.selectbox(
-    "Study Method",
+    "📝 Study Method",
     study_method_le.classes_
 )
 
 facility_rating = st.selectbox(
-    "Facility Rating",
+    "🏢 Facility Rating",
     facility_rating_le.classes_
 )
 
-# -------------------------------
+# =========================
 # Prediction
-# -------------------------------
-if st.button("Predict Exam Score"):
+# =========================
+if st.button("🎯 Predict Exam Score", use_container_width=True):
 
     sleep_quality_encoded = sleep_quality_le.transform(
         [sleep_quality]
@@ -102,8 +107,12 @@ if st.button("Predict Exam Score"):
 
     prediction = model.predict(input_df)[0]
 
-    st.success(f"🎯 Predicted Exam Score: {prediction:.2f}")
+    st.success(
+        f"🎓 Predicted Exam Score: {prediction:.2f}"
+    )
 
+# =========================
 # Footer
+# =========================
 st.markdown("---")
-st.caption("Built with Streamlit & XGBoost")
+st.caption("Built with Streamlit • XGBoost • Machine Learning")
