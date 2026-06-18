@@ -22,9 +22,10 @@ st.markdown("""
 <style>
 .movie-card {
     padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
+    border-radius: 12px;
+    border: 1px solid #31333F;
     margin-bottom: 10px;
+    background-color: #262730;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -56,6 +57,7 @@ def load_files():
 
 df, indices, tfidf_matrix = load_files()
 
+# Clean titles
 df["title"] = df["title"].fillna("").astype(str)
 
 # =====================================
@@ -84,18 +86,23 @@ num_recommendations = st.sidebar.slider(
 st.sidebar.markdown("---")
 
 with st.sidebar.expander("ℹ️ About Project"):
-    st.write("""
-    This project uses:
 
-    • NLP
+    st.markdown("""
+    **AI Movie Recommendation System**
 
-    • TF-IDF Vectorization
+    Recommend movies based on content similarity.
 
-    • Cosine Similarity
+    ### Features
+    - 🎬 Smart Movie Recommendations
+    - 🎯 Similarity Score Analysis
+    - 📊 Interactive Dashboard
+    - ⚡ Fast Recommendation Engine
 
-    • Content-Based Recommendation
-
-    • Streamlit Deployment
+    ### Model
+    - NLP
+    - TF-IDF Vectorization
+    - Cosine Similarity
+    - Content-Based Filtering
     """)
 
 # =====================================
@@ -104,25 +111,32 @@ with st.sidebar.expander("ℹ️ About Project"):
 
 def recommend(title, n=10):
 
-    idx = indices[title]
+    try:
 
-    sim_scores = linear_kernel(
-        tfidf_matrix[idx],
-        tfidf_matrix
-    ).flatten()
+        idx = indices[title]
 
-    movie_indices = sim_scores.argsort()[::-1][1:n+1]
+        sim_scores = linear_kernel(
+            tfidf_matrix[idx],
+            tfidf_matrix
+        ).flatten()
 
-    recommendations = []
+        movie_indices = sim_scores.argsort()[::-1][1:n+1]
 
-    for i in movie_indices:
+        recommendations = []
 
-        recommendations.append({
-            "Movie": df.iloc[i]["title"],
-            "Score": round(sim_scores[i] * 100, 2)
-        })
+        for i in movie_indices:
 
-    return recommendations
+            recommendations.append({
+                "Movie": df.iloc[i]["title"],
+                "Score": round(sim_scores[i] * 100, 2)
+            })
+
+        return recommendations
+
+    except Exception:
+
+        return None
+
 
 # =====================================
 # MAIN UI
@@ -130,11 +144,9 @@ def recommend(title, n=10):
 
 st.title("🎬 AI Movie Recommendation System")
 
-st.markdown("""
-Discover movies similar to your favorites using
-**Natural Language Processing (TF-IDF)** and
-**Cosine Similarity**.
-""")
+st.info(
+    "🍿 Discover movies similar to your favorite films using NLP, TF-IDF Vectorization, and Cosine Similarity."
+)
 
 movie_list = sorted(
     df["title"]
@@ -148,7 +160,7 @@ selected_movie = st.selectbox(
     movie_list
 )
 
-st.info(f"Selected Movie: {selected_movie}")
+st.success(f"Selected Movie: {selected_movie}")
 
 # =====================================
 # RECOMMEND BUTTON
@@ -163,50 +175,56 @@ if st.button("🎯 Recommend Movies"):
         num_recommendations
     )
 
-    st.subheader("🎥 Recommended Movies")
+    if recommendations is None:
 
-    rec_df = pd.DataFrame(recommendations)
+        st.error("Movie not found in database.")
 
-    st.dataframe(
-        rec_df,
-        use_container_width=True
-    )
+    else:
 
-    st.metric(
-        "Recommendations Generated",
-        len(rec_df)
-    )
+        st.subheader("🎥 Recommended Movies")
 
-    st.subheader("⭐ Recommendation Strength")
+        rec_df = pd.DataFrame(recommendations)
 
-    for rec in recommendations:
-
-        movie = rec["Movie"]
-        score = rec["Score"]
-
-        st.markdown(
-            f"""
-            <div class="movie-card">
-                <h4>🎬 {movie}</h4>
-                <p>Similarity Score: {score}%</p>
-            </div>
-            """,
-            unsafe_allow_html=True
+        st.dataframe(
+            rec_df,
+            use_container_width=True
         )
 
-        st.progress(min(int(score), 100))
+        st.metric(
+            "Recommendations Generated",
+            len(rec_df)
+        )
 
-        if score >= 80:
-            st.success("🔥 Excellent Match")
+        st.subheader("⭐ Recommendation Strength")
 
-        elif score >= 60:
-            st.warning("⭐ Good Match")
+        for rec in recommendations:
 
-        elif score >= 40:
-            st.info("👍 Moderate Match")
+            movie = rec["Movie"]
+            score = rec["Score"]
 
-        else:
-            st.caption("🎲 Low Match")
+            st.markdown(
+                f"""
+                <div class="movie-card">
+                    <h4>🎬 {movie}</h4>
+                    <p>Similarity Score: {score}%</p>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+
+            st.progress(min(int(score), 100))
+
+            if score >= 80:
+                st.success("🔥 Excellent Match")
+
+            elif score >= 60:
+                st.warning("⭐ Good Match")
+
+            elif score >= 40:
+                st.info("👍 Moderate Match")
+
+            else:
+                st.caption("🎲 Low Match")
 
 # =====================================
 # FOOTER
@@ -214,16 +232,19 @@ if st.button("🎯 Recommend Movies"):
 
 st.markdown("---")
 
-st.markdown("""
-### 🚀 Technologies Used
+col1, col2, col3 = st.columns(3)
 
-- Python
-- Pandas
-- Scikit-Learn
-- NLP
-- TF-IDF Vectorizer
-- Cosine Similarity
-- Streamlit
+with col1:
+    st.metric("🧠 Algorithm", "TF-IDF")
 
-Made with ❤️ by Deepak Kumar
-""")
+with col2:
+    st.metric("🎯 Recommender", "Content-Based")
+
+with col3:
+    st.metric("⚡ Framework", "Streamlit")
+
+st.success(
+    "🎬 Powered by NLP, TF-IDF Vectorization and Cosine Similarity"
+)
+
+st.caption("Made with ❤️ by Deepak Kumar")
