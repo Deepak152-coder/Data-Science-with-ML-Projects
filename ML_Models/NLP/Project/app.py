@@ -1,30 +1,54 @@
 import streamlit as st
 import pandas as pd
 import pickle
+from pathlib import Path
 from sklearn.metrics.pairwise import linear_kernel
 
-# ==========================
-# Page Configuration
-# ==========================
+# =====================================
+# PAGE CONFIG
+# =====================================
+
 st.set_page_config(
-    page_title="Movie Recommendation System",
+    page_title="AI Movie Recommendation System",
     page_icon="🎬",
-    layout="centered"
+    layout="wide"
 )
 
-# ==========================
-# Load Data
-# ==========================
+# =====================================
+# CUSTOM CSS
+# =====================================
+
+st.markdown("""
+<style>
+.main {
+    padding-top: 1rem;
+}
+.block-container {
+    padding-top: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =====================================
+# FILE PATHS
+# =====================================
+
+BASE_DIR = Path(__file__).resolve().parent
+
+# =====================================
+# LOAD FILES
+# =====================================
+
 @st.cache_resource
 def load_files():
 
-    with open("df.pkl", "rb") as f:
+    with open(BASE_DIR / "df.pkl", "rb") as f:
         df = pickle.load(f)
 
-    with open("indices.pkl", "rb") as f:
+    with open(BASE_DIR / "indices.pkl", "rb") as f:
         indices = pickle.load(f)
 
-    with open("tfidf_matrix.pkl", "rb") as f:
+    with open(BASE_DIR / "tfidf_matrix.pkl", "rb") as f:
         tfidf_matrix = pickle.load(f)
 
     return df, indices, tfidf_matrix
@@ -32,15 +56,56 @@ def load_files():
 
 df, indices, tfidf_matrix = load_files()
 
-# Clean title column
+# Clean titles
 df["title"] = df["title"].fillna("").astype(str)
 
-# ==========================
-# Recommendation Function
-# ==========================
+# =====================================
+# SIDEBAR
+# =====================================
+
+st.sidebar.title("📊 Dashboard")
+
+st.sidebar.metric(
+    "Total Movies",
+    len(df)
+)
+
+st.sidebar.metric(
+    "Unique Movies",
+    df["title"].nunique()
+)
+
+num_recommendations = st.sidebar.slider(
+    "Number of Recommendations",
+    min_value=1,
+    max_value=20,
+    value=10
+)
+
+st.sidebar.markdown("---")
+
+with st.sidebar.expander("ℹ️ About Project"):
+
+    st.write("""
+    This project uses:
+
+    - Natural Language Processing
+    - TF-IDF Vectorization
+    - Cosine Similarity
+    - Content-Based Filtering
+    - Streamlit Deployment
+
+    Built for Movie Recommendation.
+    """)
+
+# =====================================
+# RECOMMENDATION FUNCTION
+# =====================================
+
 def recommend(title, n=10):
 
     try:
+
         idx = indices[title]
 
         sim_scores = linear_kernel(
@@ -50,51 +115,118 @@ def recommend(title, n=10):
 
         movie_indices = sim_scores.argsort()[::-1][1:n+1]
 
-        return df["title"].iloc[movie_indices].tolist()
+        recommendations = []
+
+        for i in movie_indices:
+
+            recommendations.append({
+                "Movie": df.iloc[i]["title"],
+                "Similarity Score (%)": round(
+                    sim_scores[i] * 100,
+                    2
+                )
+            })
+
+        return recommendations
 
     except Exception:
-        return ["Movie not found"]
+        return None
 
+# =====================================
+# MAIN UI
+# =====================================
 
-# ==========================
-# UI
-# ==========================
-st.title("🎬 Movie Recommendation System")
-st.markdown(
-    "Get movie recommendations based on movie content similarity using **TF-IDF**."
+st.title("🎬 AI Movie Recommendation System")
+
+st.markdown("""
+Discover movies similar to your favorites using
+**Natural Language Processing (TF-IDF)** and
+**Cosine Similarity**.
+""")
+
+movie_list = sorted(
+    df["title"]
+    .dropna()
+    .astype(str)
+    .unique()
 )
 
-movie_list = sorted(df["title"].dropna().astype(str).unique())
-
 selected_movie = st.selectbox(
-    "Select a Movie",
+    "🔍 Search and Select a Movie",
     movie_list
 )
 
-num_recommendations = st.slider(
-    "Number of Recommendations",
-    min_value=1,
-    max_value=20,
-    value=10
-)
+# =====================================
+# MOVIE INFO
+# =====================================
 
-if st.button("Recommend Movies"):
+if selected_movie:
+
+    st.info(f"Selected Movie: {selected_movie}")
+
+# =====================================
+# RECOMMEND BUTTON
+# =====================================
+
+if st.button("🎯 Recommend Movies"):
 
     recommendations = recommend(
         selected_movie,
         num_recommendations
     )
 
-    st.subheader("Recommended Movies")
+    if recommendations is None:
 
-    if recommendations[0] == "Movie not found":
-        st.error("Movie not found in database.")
+        st.error("Movie not found!")
+
     else:
-        for i, movie in enumerate(recommendations, 1):
-            st.write(f"**{i}.** {movie}")
 
-# ==========================
-# Footer
-# ==========================
+        st.subheader("🎥 Recommended Movies")
+
+        rec_df = pd.DataFrame(
+            recommendations
+        )
+
+        st.dataframe(
+            rec_df,
+            use_container_width=True
+        )
+
+        st.subheader("⭐ Similarity Scores")
+
+        for _, row in rec_df.iterrows():
+
+            st.write(
+                f"**{row['Movie']}**"
+            )
+
+            score = min(
+                int(row["Similarity Score (%)"]),
+                100
+            )
+
+            st.progress(score)
+
+            st.caption(
+                f"Similarity Score: {row['Similarity Score (%)']}%"
+            )
+
+# =====================================
+# FOOTER
+# =====================================
+
 st.markdown("---")
-st.caption("Built with Streamlit | NLP Movie Recommendation System")
+
+st.markdown("""
+### 🚀 Technologies Used
+
+- Python
+- Pandas
+- Scikit-Learn
+- TF-IDF Vectorizer
+- Cosine Similarity
+- Streamlit
+- NLP
+
+Made with ❤️ by Deepak Kumar
+""")
