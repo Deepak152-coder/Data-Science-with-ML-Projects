@@ -11,3 +11,6 @@ https://deepak-delivery-time-random-f.streamlit.app/
 
 <!-- XGBoost Exam Score Prediction System -->
 https://xgboost-exam-score-prediction.streamlit.app/
+
+<!-- ANN Laptop Price Predictor -->
+https://ann-laptop-price-predictor-02.onrender.com/
