@@ -2,4 +2,4 @@
 cd "Deep_Learning\ANN\Project"
 
 <!-- Run The File -->
-streamlit run app.py
+streamlit run App.py
