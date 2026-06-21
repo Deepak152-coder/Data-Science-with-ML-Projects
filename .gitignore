@@ -1,0 +1,19 @@
+# Ignore Keras model files
+*.keras
+
+# Optional: Ignore other ML model files
+*.h5
+*.hdf5
+*.pkl
+*.joblib
+
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+venv/
+.env
+
+# Smart Parking Dataset
+Deep_Learning/CNN/Second_Project/Dataset/
