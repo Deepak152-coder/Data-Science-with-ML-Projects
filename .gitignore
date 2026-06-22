@@ -1,19 +1,29 @@
-# Ignore Keras model files
-*.keras
-
-# Optional: Ignore other ML model files
-*.h5
-*.hdf5
-*.pkl
-*.joblib
-
-# Python
+# Python Cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
 # Virtual Environment
 venv/
 .env
 
-# Smart Parking Dataset
+# Jupyter
+.ipynb_checkpoints/
+
+# Large Datasets
 Deep_Learning/CNN/Second_Project/Dataset/
+Deep_Learning/RNN/First_Project/combined_data.csv
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Large CNN Model
+Deep_Learning/CNN/First_Project/fruit_classifier.keras
