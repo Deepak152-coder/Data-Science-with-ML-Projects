@@ -1,5 +1,13 @@
 import streamlit as st
+import os
+from dotenv import load_dotenv
 from chatbot import get_response
+
+load_dotenv()
+
+LOCAL_KEY_EXISTS = bool(
+    os.getenv("GROQ_API_KEY")
+)
 
 # =========================
 # PAGE CONFIG
@@ -108,31 +116,64 @@ with st.sidebar:
 
     st.info("🚀 Groq Llama 3.3 70B")
 
+    if not LOCAL_KEY_EXISTS:
+
+        api_key = st.text_input(
+            "🔑 Enter Groq API Key",
+            type="password",
+            help="Required when running on Streamlit Cloud."
+        )
+
+        st.caption(
+            "Get your key from https://console.groq.com/keys"
+        )
+
+    else:
+
+        api_key = None
+
+        st.success(
+            "✅ Using local .env API key"
+        )
+
     if st.button("🗑️ Clear Chat"):
+
         st.session_state.messages = [
             {
                 "role": "system",
                 "content": SYSTEM_PROMPT
             }
         ]
+
         st.rerun()
 
     st.divider()
 
     visible_messages = [
-        msg for msg in st.session_state.messages
+        msg
+        for msg in st.session_state.messages
         if msg["role"] != "system"
     ]
 
-    total_messages = len(visible_messages)
+    total_messages = len(
+        visible_messages
+    )
 
     user_messages = len([
-        msg for msg in visible_messages
+        msg
+        for msg in visible_messages
         if msg["role"] == "user"
     ])
 
-    st.metric("Total Messages", total_messages)
-    st.metric("Questions Asked", user_messages)
+    st.metric(
+        "Total Messages",
+        total_messages
+    )
+
+    st.metric(
+        "Questions Asked",
+        user_messages
+    )
 
     st.divider()
 
@@ -158,7 +199,9 @@ for msg in st.session_state.messages:
         continue
 
     with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
+        st.markdown(
+            msg["content"]
+        )
 
 # =========================
 # CHAT INPUT
@@ -177,10 +220,21 @@ if prompt:
         }
     )
 
-    with st.spinner("🤔 Thinking..."):
+    if not LOCAL_KEY_EXISTS and not api_key:
+
+        st.error(
+            "Please enter your Groq API Key in the sidebar."
+        )
+
+        st.stop()
+
+    with st.spinner(
+        "🤔 Thinking..."
+    ):
 
         response = get_response(
-            st.session_state.messages
+            st.session_state.messages,
+            api_key
         )
 
     st.session_state.messages.append(
