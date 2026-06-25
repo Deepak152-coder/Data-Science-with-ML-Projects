@@ -1,45 +1,123 @@
+# ==================================================
+# Core LangChain
+# ==================================================
 langchain
 langchain-core
 langchain-community
-
+langchain-text-splitters
 langgraph
 
-# Providers
-
+# ==================================================
+# LLM Providers
+# ==================================================
 langchain-openai
 langchain-google-genai
 langchain-groq
 langchain-mistralai
-langchain-huggingface
 langchain-anthropic
+langchain-huggingface
 
+openai
+mistralai
+
+# ==================================================
 # Hugging Face
-
+# ==================================================
 huggingface_hub
 transformers
 sentence-transformers
+torch
 
+# ==================================================
 # Environment Variables
-
+# ==================================================
 python-dotenv
 
-# OpenAI Compatible APIs (OpenRouter, Together AI, etc.)
-
-openai
-
+# ==================================================
 # Vector Databases / RAG
-
-faiss-cpu
+# ==================================================
+langchain-chroma
 chromadb
+faiss-cpu
+qdrant-client
+pinecone
+weaviate-client
+pymilvus
+
+# ==================================================
+# Document Loaders
+# ==================================================
+pypdf
+pymupdf
+pdfplumber
+python-docx
+unstructured
+beautifulsoup4
+lxml
+
+# ==================================================
+# OCR (Optional)
+# ==================================================
+pytesseract
+Pillow
+
+# ==================================================
+# Tokenization
+# ==================================================
 tiktoken
 
-# API & Deployment
+# ==================================================
+# Data Processing
+# ==================================================
+numpy
+pandas
 
+# ==================================================
+# API & Deployment
+# ==================================================
 fastapi
 uvicorn
 streamlit
+python-multipart
+
+# ==================================================
+# HTTP Clients
+# ==================================================
 requests
+httpx
+aiofiles
 
+# ==================================================
 # Utilities
-
+# ==================================================
 pydantic
+loguru
+tqdm
+joblib
+
+# ==================================================
+# Database (Optional)
+# ==================================================
+sqlalchemy
+
+# ==================================================
+# Evaluation & Monitoring (Optional)
+# ==================================================
+ragas
+datasets
+langsmith
+
+# ==================================================
+# Notebook Support
+# ==================================================
+jupyter
+ipykernel
+
+# ==================================================
+# Retrievers
+# ==================================================
+arxiv==2.1.3
+
+
+torchvision
+tavily
