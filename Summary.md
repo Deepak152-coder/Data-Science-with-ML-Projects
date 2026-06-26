@@ -17,3 +17,6 @@ https://ann-laptop-price-predictor-02.onrender.com/
 
 🤖 Deepak AI Chatbot
 https://deepak-ai-chatbot.streamlit.app/
+
+🚚 Delivery Time Prediction System With FASTAPI
+https://food-delivery-api.streamlit.app/
