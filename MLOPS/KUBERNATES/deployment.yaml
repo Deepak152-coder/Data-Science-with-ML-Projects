@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: weather-app
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: weather-app
+
+  template:
+    metadata:
+      labels:
+        app: weather-app
+
+    spec:
+      containers:
+      - name: weather-app
+        image: deepak01210/weather-app:latest
+        imagePullPolicy: Always
+
+        ports:
+        - containerPort: 8501
+
+        env:
+        - name: OPENWEATHER_API_KEY
+          value: "d8fc333c6c7747bc87610211262806"
+
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
